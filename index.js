@@ -26,6 +26,12 @@ const run = () => {
       const tasks = await cursor.toArray();
       res.send({ result: tasks });
     });
+    app.get("/my-tasks/:id", async (req, res) => {
+      const id = ObjectId(req.params.id);
+      const query = { _id: id };
+      const task = await taskCollection.findOne(query);
+      res.send(task);
+    });
     app.post("/", async (req, res) => {
       const task = req.body;
       console.log(task);
@@ -40,6 +46,19 @@ const run = () => {
         $set: {
           completed: true,
           comment: req.body.comment,
+        },
+      };
+      const result = await taskCollection.updateOne(filter, updatedDoc);
+      res.send({ message: "Task Completed !!!" });
+    });
+    app.patch("/edit-task/:id", async (req, res) => {
+      const id = ObjectId(req.params.id);
+      const filter = { _id: id };
+      const updatedDoc = {
+        $set: {
+          title: req.body.title,
+          description: req.body.description,
+          image: req.body.image,
         },
       };
       const result = await taskCollection.updateOne(filter, updatedDoc);
