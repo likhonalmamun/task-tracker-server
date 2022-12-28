@@ -26,6 +26,11 @@ const run = () => {
       const tasks = await cursor.toArray();
       res.send({ result: tasks });
     });
+    app.get("/completed-tasks", async (req, res) => {
+      const cursor = await taskCollection.find({ completed: true });
+      const tasks = await cursor.toArray();
+      res.send({ tasks });
+    });
     app.get("/my-tasks/:id", async (req, res) => {
       const id = ObjectId(req.params.id);
       const query = { _id: id };
@@ -39,7 +44,6 @@ const run = () => {
       res.send({ message: "Task added successfully!!" });
     });
     app.patch("/my-tasks/:id", async (req, res) => {
-      console.log(req.body.comment);
       const id = ObjectId(req.params.id);
       const filter = { _id: id };
       const updatedDoc = {
@@ -50,6 +54,17 @@ const run = () => {
       };
       const result = await taskCollection.updateOne(filter, updatedDoc);
       res.send({ message: "Task Completed !!!" });
+    });
+    app.patch("/incomplete/:id", async (req, res) => {
+      const id = ObjectId(req.params.id);
+      const filter = { _id: id };
+      const updatedDoc = {
+        $set: {
+          completed: false,
+        },
+      };
+      const result = await taskCollection.updateOne(filter, updatedDoc);
+      res.send({ message: "Task converted to incomplete !!!" });
     });
     app.patch("/edit-task/:id", async (req, res) => {
       const id = ObjectId(req.params.id);
